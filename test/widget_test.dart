@@ -45,8 +45,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Campus coffee'), findsOneWidget);
-    expect(find.text('Rs. 2,065'), findsOneWidget);
-    expect(find.text('Rs. 770 / 1000'), findsOneWidget);
+    expect(find.text('Rs. 150'), findsWidgets);
+    expect(find.text('Rs. 150 / 0'), findsOneWidget);
   });
 
   testWidgets('sidebar pages show real tracker content', (tester) async {
@@ -61,7 +61,7 @@ void main() {
     await tester.tap(find.text('Expenses').first);
     await tester.pumpAndSettle();
     expect(find.text('All Expenses'), findsOneWidget);
-    expect(find.text('Lunch near campus'), findsOneWidget);
+    expect(find.text('Lunch near campus'), findsNothing);
 
     await tester.tap(find.text('Categories').first);
     await tester.pumpAndSettle();
@@ -103,7 +103,7 @@ void main() {
     );
     await tester.tap(find.text('Save Money'));
     await tester.pumpAndSettle();
-    expect(find.text('Rs. 8,085'), findsOneWidget);
+    expect(find.text('Rs. 10,000'), findsWidgets);
 
     await tester.tap(find.text('Set Daily Limit'));
     await tester.pumpAndSettle();
@@ -113,7 +113,7 @@ void main() {
     );
     await tester.tap(find.text('Save Limit'));
     await tester.pumpAndSettle();
-    expect(find.text('Rs. 330'), findsOneWidget);
+    expect(find.text('Rs. 450'), findsOneWidget);
 
     await tester.tap(find.text('Expenses').first);
     await tester.pumpAndSettle();
@@ -158,7 +158,7 @@ void main() {
     );
     await tester.tap(find.text('Save Limit'));
     await tester.pumpAndSettle();
-    expect(find.text('Rs. 620 used, Rs. 880 left'), findsOneWidget);
+    expect(find.text('Rs. 0 used, Rs. 1500 left'), findsOneWidget);
 
     await tester.tap(find.text('Dashboard').first);
     await tester.pumpAndSettle();
@@ -166,8 +166,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Reset'));
     await tester.pumpAndSettle();
-    expect(find.text('Rs. -1,915'), findsOneWidget);
-    expect(find.text('Rs. 1,915'), findsOneWidget);
+    expect(find.text('Rs. 0'), findsWidgets);
   });
 
   testWidgets('manages ledgers and piggybank goals from their pages', (
@@ -190,14 +189,14 @@ void main() {
     await tester.tap(find.text('Save Ledger'));
     await tester.pumpAndSettle();
     expect(find.text('Neha'), findsOneWidget);
-    expect(find.text('Rs. 480'), findsOneWidget);
+    expect(find.text('Rs. 300'), findsWidgets);
 
     await tester.tap(find.byKey(const Key('edit-ledger-0')));
     await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const Key('ledger-amount-field')), '-50');
     await tester.tap(find.text('Save Ledger'));
     await tester.pumpAndSettle();
-    expect(find.text('Rs. 130'), findsOneWidget);
+    expect(find.text('Rs. -50'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('delete-ledger-0')));
     await tester.pumpAndSettle();

@@ -36,6 +36,15 @@ migrate_working_dir/
 # C++ backend build artifacts
 /backend/build/
 /backend/*.exe
+/backend/server/httplib.h
+/backend/server/json.hpp
+
+# C++ backend runtime data (JSON persistence)
+/backend/data/*.json
+!/backend/data/.gitkeep
+
+# AI API keys — never commit secrets
+lib/core/constants/api_keys.dart
 
 # Symbolication related
 app.*.symbols

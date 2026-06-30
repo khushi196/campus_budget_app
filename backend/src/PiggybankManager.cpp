@@ -31,6 +31,11 @@ bool PiggybankManager::deleteGoal(int id) {
     return goals_.size() != originalSize;
 }
 
+void PiggybankManager::clearGoals() {
+    goals_.clear();
+    nextId_ = 1;
+}
+
 bool PiggybankManager::deposit(int id, double amount) {
     GoalRecord* record = findRecord(id);
     if (record == nullptr) {
@@ -66,6 +71,10 @@ std::vector<Piggybank> PiggybankManager::goals() const {
         result.push_back(record.piggybank);
     }
     return result;
+}
+
+std::vector<PiggybankManager::GoalRecord> PiggybankManager::goalRecords() const {
+    return goals_;
 }
 
 PiggybankManager::GoalRecord* PiggybankManager::findRecord(int id) {

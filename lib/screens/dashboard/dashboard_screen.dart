@@ -133,9 +133,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     icon: Icons.timelapse_rounded,
                     color: AppColors.coral,
                   ),
-                  const StatCard(
+                  StatCard(
                     title: 'Ledger balance',
-                    value: 'Rs. 180',
+                    value: _formatCurrency(expenseService.ledgerBalance),
                     caption: 'Net amount receivable',
                     icon: Icons.group_rounded,
                     color: AppColors.blue,
@@ -162,6 +162,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           const SizedBox(height: 18),
                           _BudgetAndGoalsSection(
                             categories: expenseService.categories,
+                            ledgers: expenseService.ledgers,
+                            piggybanks: expenseService.piggybanks,
                           ),
                         ],
                       ),
@@ -182,7 +184,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     onAddExpense: _showAddExpenseDialog,
                   ),
                   const SizedBox(height: 18),
-                  _BudgetAndGoalsSection(categories: expenseService.categories),
+                  _BudgetAndGoalsSection(
+                    categories: expenseService.categories,
+                    ledgers: expenseService.ledgers,
+                    piggybanks: expenseService.piggybanks,
+                  ),
                   const SizedBox(height: 18),
                   const AiAdvisorPanel(insights: DemoData.insights),
                 ],
@@ -281,9 +287,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
 class _BudgetAndGoalsSection extends StatelessWidget {
-  const _BudgetAndGoalsSection({required this.categories});
+  const _BudgetAndGoalsSection({
+    required this.categories,
+    required this.ledgers,
+    required this.piggybanks,
+  });
 
   final List<CategoryBudget> categories;
+  final List<Ledger> ledgers;
+  final List<Piggybank> piggybanks;
 
   @override
   Widget build(BuildContext context) {
@@ -295,7 +307,12 @@ class _BudgetAndGoalsSection extends StatelessWidget {
             children: [
               Expanded(child: _CategoryBudgetCard(categories: categories)),
               const SizedBox(width: 18),
-              const Expanded(child: _MoneyMovementCard()),
+              Expanded(
+                child: _MoneyMovementCard(
+                  ledgers: ledgers,
+                  piggybanks: piggybanks,
+                ),
+              ),
             ],
           );
         }
@@ -304,7 +321,7 @@ class _BudgetAndGoalsSection extends StatelessWidget {
           children: [
             _CategoryBudgetCard(categories: categories),
             const SizedBox(height: 18),
-            const _MoneyMovementCard(),
+            _MoneyMovementCard(ledgers: ledgers, piggybanks: piggybanks),
           ],
         );
       },
@@ -385,7 +402,10 @@ class _BudgetProgress extends StatelessWidget {
 }
 
 class _MoneyMovementCard extends StatelessWidget {
-  const _MoneyMovementCard();
+  const _MoneyMovementCard({required this.ledgers, required this.piggybanks});
+
+  final List<Ledger> ledgers;
+  final List<Piggybank> piggybanks;
 
   @override
   Widget build(BuildContext context) {
@@ -402,11 +422,11 @@ class _MoneyMovementCard extends StatelessWidget {
             const SizedBox(height: 16),
             Text('Ledgers', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
-            ...DemoData.ledgers.map((ledger) => _LedgerRow(ledger: ledger)),
+            ...ledgers.map((ledger) => _LedgerRow(ledger: ledger)),
             const SizedBox(height: 16),
             Text('Piggybanks', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 10),
-            ...DemoData.piggybanks.map(
+            ...piggybanks.map(
               (piggybank) => _PiggybankRow(piggybank: piggybank),
             ),
           ],

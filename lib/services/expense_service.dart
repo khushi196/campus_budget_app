@@ -30,9 +30,9 @@ class ExpenseService {
       baseCategories: DemoData.categories,
       baseLedgers: DemoData.ledgers,
       basePiggybanks: DemoData.piggybanks,
-      initialTotalSpent: 1915,
-      initialDailyLimit: 200,
-      initialTodaySpending: 120,
+      initialTotalSpent: 0,
+      initialDailyLimit: 0,
+      initialTodaySpending: 0,
       store: store ?? NoopExpenseStore(),
     );
   }

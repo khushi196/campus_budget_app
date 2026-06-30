@@ -34,6 +34,10 @@ bool LedgerManager::removeBalance(const std::string& friendName) {
     return entries_.size() != originalSize;
 }
 
+void LedgerManager::clearBalances() {
+    entries_.clear();
+}
+
 double LedgerManager::balanceFor(const std::string& friendName) const {
     const auto entry = std::find_if(
         entries_.begin(),

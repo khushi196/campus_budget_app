@@ -12,6 +12,7 @@ class LedgerManager {
 public:
     void upsertBalance(const std::string& friendName, double amount);
     bool removeBalance(const std::string& friendName);
+    void clearBalances();
 
     double balanceFor(const std::string& friendName) const;
     double netBalance() const;

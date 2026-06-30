@@ -28,11 +28,18 @@ void testBudgetManagerTracksExpenses() {
     assert(closeTo(manager.categoryTotal("Food"), 150.0));
     assert(closeTo(manager.categoryTotal("Stationery"), 85.0));
     assert(manager.expenses().size() == 2);
+    assert(manager.expenseRecords().size() == 2);
+    assert(manager.expenseRecords()[0].id == lunchId);
 
     manager.deleteExpense(lunchId);
 
     assert(closeTo(manager.totalSpent(), 85.0));
     assert(closeTo(manager.categoryTotal("Food"), 0.0));
+
+    manager.clearExpenses();
+
+    assert(manager.expenses().empty());
+    assert(closeTo(manager.totalSpent(), 0.0));
 }
 
 void testLedgerManagerTracksFriendBalances() {
@@ -50,6 +57,11 @@ void testLedgerManagerTracksFriendBalances() {
 
     assert(closeTo(manager.netBalance(), 190.0));
     assert(manager.entries().size() == 2);
+
+    manager.clearBalances();
+
+    assert(manager.entries().empty());
+    assert(closeTo(manager.netBalance(), 0.0));
 }
 
 void testPiggybankManagerTracksGoals() {
@@ -62,6 +74,8 @@ void testPiggybankManagerTracksGoals() {
 
     const campus::Piggybank* laptop = manager.findGoal(laptopId);
     assert(laptop != nullptr);
+    assert(manager.goalRecords().size() == 1);
+    assert(manager.goalRecords()[0].id == laptopId);
     assert(closeTo(laptop->savedAmount(), 6000.0));
     assert(closeTo(laptop->progress(), 0.1));
 
@@ -76,6 +90,11 @@ void testPiggybankManagerTracksGoals() {
 
     manager.deleteGoal(laptopId);
     assert(manager.findGoal(laptopId) == nullptr);
+
+    manager.addGoal(campus::Piggybank("Trip Fund", 5000.0, 2100.0, "05 Aug"));
+    manager.clearGoals();
+
+    assert(manager.goals().empty());
 }
 
 void testReportGeneratorSummarizesManagers() {

@@ -8,7 +8,9 @@ import '../screens/expenses/expenses_screen.dart';
 import '../screens/ledgers/ledgers_screen.dart';
 import '../screens/piggybanks/piggybanks_screen.dart';
 import '../screens/reports/reports_screen.dart';
+import '../services/backend_expense_store.dart';
 import '../services/expense_service.dart';
+import '../services/expense_store.dart';
 import '../services/expense_store_factory.dart';
 import 'sidebar_nav.dart';
 
@@ -21,9 +23,31 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int _selectedIndex = 0;
-  late final ExpenseService _expenseService = ExpenseService.demo(
-    store: createExpenseStore(),
-  );
+  ExpenseService? _expenseService;
+  bool _usingBackend = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initStore();
+  }
+
+  Future<void> _initStore() async {
+    // Try C++ backend first; fall back to localStorage within 1 second.
+    ExpenseStore store;
+    bool usingBackend = false;
+    try {
+      store = await createExpenseStoreAsync();
+      usingBackend = store is BackendExpenseStore;
+    } catch (_) {
+      store = createExpenseStore();
+    }
+    if (!mounted) return;
+    setState(() {
+      _expenseService = ExpenseService.demo(store: store);
+      _usingBackend = usingBackend;
+    });
+  }
 
   static const _items = [
     NavItem(label: 'Dashboard', icon: Icons.dashboard_rounded),
@@ -37,6 +61,24 @@ class _AppShellState extends State<AppShell> {
 
   @override
   Widget build(BuildContext context) {
+    // Show a brief loading screen while probing for the C++ backend (max 1s)
+    if (_expenseService == null) {
+      return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(color: AppColors.teal),
+              SizedBox(height: 16),
+              Text('Starting up…',
+                  style: TextStyle(color: AppColors.mutedInk)),
+            ],
+          ),
+        ),
+      );
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWide = constraints.maxWidth >= 940;
@@ -50,7 +92,12 @@ class _AppShellState extends State<AppShell> {
                   selectedIndex: _selectedIndex,
                   onSelected: _selectScreen,
                 ),
-                Expanded(child: _MainArea(child: _buildScreen())),
+                Expanded(
+                  child: _MainArea(
+                    usingBackend: _usingBackend,
+                    child: _buildScreen(),
+                  ),
+                ),
               ],
             ),
           );
@@ -72,7 +119,10 @@ class _AppShellState extends State<AppShell> {
               },
             ),
           ),
-          body: _MainArea(child: _buildScreen()),
+          body: _MainArea(
+            usingBackend: _usingBackend,
+            child: _buildScreen(),
+          ),
         );
       },
     );
@@ -87,31 +137,32 @@ class _AppShellState extends State<AppShell> {
   }
 
   Widget _buildScreen() {
+    final svc = _expenseService!;
     return switch (_selectedIndex) {
       0 => DashboardScreen(
-        expenseService: _expenseService,
+        expenseService: svc,
         onDataChanged: _refreshData,
       ),
       1 => ExpensesScreen(
-        expenseService: _expenseService,
+        expenseService: svc,
         onDataChanged: _refreshData,
       ),
       2 => CategoriesScreen(
-        expenseService: _expenseService,
+        expenseService: svc,
         onDataChanged: _refreshData,
       ),
       3 => LedgersScreen(
-        expenseService: _expenseService,
+        expenseService: svc,
         onDataChanged: _refreshData,
       ),
       4 => PiggybanksScreen(
-        expenseService: _expenseService,
+        expenseService: svc,
         onDataChanged: _refreshData,
       ),
-      5 => const AiAdvisorScreen(),
-      6 => ReportsScreen(expenseService: _expenseService),
+      5 => AiAdvisorScreen(expenseService: svc),
+      6 => ReportsScreen(expenseService: svc),
       _ => DashboardScreen(
-        expenseService: _expenseService,
+        expenseService: svc,
         onDataChanged: _refreshData,
       ),
     };
@@ -119,9 +170,10 @@ class _AppShellState extends State<AppShell> {
 }
 
 class _MainArea extends StatelessWidget {
-  const _MainArea({required this.child});
+  const _MainArea({required this.child, required this.usingBackend});
 
   final Widget child;
+  final bool usingBackend;
 
   @override
   Widget build(BuildContext context) {
@@ -141,16 +193,65 @@ class _MainArea extends StatelessWidget {
                   'Campus Budget',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
+                const SizedBox(width: 12),
+                // Backend status badge
+                Tooltip(
+                  message: usingBackend
+                      ? 'Connected to C++ backend API (localhost:8080)'
+                      : 'Using browser localStorage (C++ server not running)',
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: usingBackend
+                          ? AppColors.teal.withValues(alpha: 0.12)
+                          : AppColors.mutedInk.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: usingBackend
+                            ? AppColors.teal.withValues(alpha: 0.35)
+                            : AppColors.border,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          usingBackend
+                              ? Icons.dns_rounded
+                              : Icons.storage_rounded,
+                          size: 11,
+                          color: usingBackend
+                              ? AppColors.teal
+                              : AppColors.mutedInk,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          usingBackend ? 'C++ API' : 'Local',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: usingBackend
+                                ? AppColors.teal
+                                : AppColors.mutedInk,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 const Spacer(),
                 IconButton(
                   tooltip: 'Search',
                   onPressed: () {},
-                  icon: const Icon(Icons.search_rounded, color: AppColors.blue),
+                  icon: const Icon(Icons.search_rounded,
+                      color: AppColors.blue),
                 ),
                 const SizedBox(width: 8),
                 CircleAvatar(
                   radius: 18,
-                  backgroundColor: AppColors.coral.withValues(alpha: 0.16),
+                  backgroundColor:
+                      AppColors.coral.withValues(alpha: 0.16),
                   child: const Text(
                     'K',
                     style: TextStyle(

@@ -21,14 +21,14 @@ void main() {
     );
 
     expect(service.expenses.first.note, 'Campus coffee');
-    expect(service.totalSpent, 2065);
-    expect(service.todaySpending, 270);
+    expect(service.totalSpent, 150);
+    expect(service.todaySpending, 150);
     expect(service.dailyLimitLeft, 0);
     expect(
       service.categories
           .firstWhere((category) => category.name == 'Food')
           .spent,
-      770,
+      150,
     );
   });
 
@@ -48,12 +48,12 @@ void main() {
     final reloadedService = ExpenseService.demo(store: store);
 
     expect(reloadedService.expenses.first.note, 'Saved samosa');
-    expect(reloadedService.totalSpent, 1955);
+    expect(reloadedService.totalSpent, 40);
     expect(
       reloadedService.categories
           .firstWhere((category) => category.name == 'Food')
           .spent,
-      660,
+      40,
     );
   });
 
@@ -65,7 +65,7 @@ void main() {
     );
 
     expect(service.totalIncome, 10000);
-    expect(service.balanceLeft, 8085);
+    expect(service.balanceLeft, 10000);
     expect(service.incomeEntries.first.source, 'Parents');
   });
 
@@ -83,7 +83,7 @@ void main() {
     expect(reloadedService.incomeEntries.first.source, 'Scholarship');
     expect(reloadedService.totalIncome, 2500);
     expect(reloadedService.dailyLimit, 450);
-    expect(reloadedService.dailyLimitLeft, 330);
+    expect(reloadedService.dailyLimitLeft, 450);
   });
 
   test('deletes income entries', () {
@@ -96,7 +96,7 @@ void main() {
 
     expect(service.incomeEntries, isEmpty);
     expect(service.totalIncome, 0);
-    expect(service.balanceLeft, -1915);
+    expect(service.balanceLeft, 0);
   });
 
   test('edits and deletes added expenses', () {
@@ -120,18 +120,18 @@ void main() {
     );
 
     expect(service.expenses.first.note, 'Lab file');
-    expect(service.totalSpent, 2005);
+    expect(service.totalSpent, 90);
     expect(
       service.categories
           .firstWhere((category) => category.name == 'Stationery')
           .spent,
-      370,
+      90,
     );
 
     service.deleteAddedExpense(0);
 
-    expect(service.expenses.first.note, isNot('Lab file'));
-    expect(service.totalSpent, 1915);
+    expect(service.expenses, isEmpty);
+    expect(service.totalSpent, 0);
   });
 
   test('updates limits and clears added local data', () {
@@ -149,7 +149,7 @@ void main() {
     service.setDailyLimit(500);
     service.setCategoryLimit('Food', 1500);
 
-    expect(service.dailyLimitLeft, 340);
+    expect(service.dailyLimitLeft, 460);
     expect(
       service.categories
           .firstWhere((category) => category.name == 'Food')
@@ -159,19 +159,16 @@ void main() {
 
     service.clearAddedData();
 
-    expect(service.totalSpent, 1915);
+    expect(service.totalSpent, 0);
     expect(service.totalIncome, 0);
-    expect(service.dailyLimitLeft, 80);
+    expect(service.dailyLimitLeft, 0);
     expect(
       service.categories
           .firstWhere((category) => category.name == 'Food')
           .limit,
-      1000,
+      0,
     );
-    expect(
-      ExpenseService.demo(store: store).expenses.first.note,
-      'Lunch near campus',
-    );
+    expect(ExpenseService.demo(store: store).expenses, isEmpty);
   });
 
   test('manages and persists ledgers', () {
@@ -182,7 +179,7 @@ void main() {
     service.updateLedger(0, const Ledger(friendName: 'Neha', amount: -50));
 
     expect(service.ledgers.first.friendName, 'Neha');
-    expect(service.ledgerBalance, 130);
+    expect(service.ledgerBalance, -50);
 
     service.deleteLedger(0);
     expect(

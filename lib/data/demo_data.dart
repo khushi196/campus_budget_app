@@ -7,57 +7,32 @@ import '../models/piggybank.dart';
 class DemoData {
   const DemoData._();
 
-  static const expenses = [
-    Expense(
-      date: '30 Jun',
-      category: 'Food',
-      note: 'Lunch near campus',
-      amount: 120,
-    ),
-    Expense(
-      date: '30 Jun',
-      category: 'Stationery',
-      note: 'Notebook set',
-      amount: 85,
-    ),
-    Expense(
-      date: '29 Jun',
-      category: 'Grocery',
-      note: 'Hostel snacks',
-      amount: 260,
-    ),
-    Expense(
-      date: '28 Jun',
-      category: 'Clothes',
-      note: 'Laundry basics',
-      amount: 450,
-    ),
-  ];
+  static const expenses = <Expense>[];
 
   static const categories = [
-    CategoryBudget(name: 'Food', spent: 620, limit: 1000),
-    CategoryBudget(name: 'Stationery', spent: 280, limit: 1000),
-    CategoryBudget(name: 'Grocery', spent: 760, limit: 1000),
-    CategoryBudget(name: 'Clothes', spent: 450, limit: 1000),
+    CategoryBudget(name: 'Food', spent: 0, limit: 0),
+    CategoryBudget(name: 'Stationery', spent: 0, limit: 0),
+    CategoryBudget(name: 'Grocery', spent: 0, limit: 0),
+    CategoryBudget(name: 'Clothes', spent: 0, limit: 0),
   ];
 
   static const ledgers = [
-    Ledger(friendName: 'Khushi', amount: 60),
-    Ledger(friendName: 'Aman', amount: -120),
-    Ledger(friendName: 'Riya', amount: 240),
+    Ledger(friendName: 'Khushi', amount: 0),
+    Ledger(friendName: 'Aman', amount: 0),
+    Ledger(friendName: 'Riya', amount: 0),
   ];
 
   static const piggybanks = [
     Piggybank(
       name: 'Semester Books',
-      goalAmount: 2500,
-      savedAmount: 1450,
+      goalAmount: 0,
+      savedAmount: 0,
       dueDate: '15 Jul',
     ),
     Piggybank(
       name: 'Trip Fund',
-      goalAmount: 5000,
-      savedAmount: 2100,
+      goalAmount: 0,
+      savedAmount: 0,
       dueDate: '05 Aug',
     ),
   ];

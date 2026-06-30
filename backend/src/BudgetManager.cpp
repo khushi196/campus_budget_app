@@ -35,6 +35,11 @@ bool BudgetManager::deleteExpense(int id) {
     return expenses_.size() != originalSize;
 }
 
+void BudgetManager::clearExpenses() {
+    expenses_.clear();
+    nextId_ = 1;
+}
+
 std::vector<Expense> BudgetManager::expenses() const {
     std::vector<Expense> result;
     result.reserve(expenses_.size());
@@ -42,6 +47,10 @@ std::vector<Expense> BudgetManager::expenses() const {
         result.push_back(record.expense);
     }
     return result;
+}
+
+std::vector<BudgetManager::ExpenseRecord> BudgetManager::expenseRecords() const {
+    return expenses_;
 }
 
 double BudgetManager::totalSpent() const {

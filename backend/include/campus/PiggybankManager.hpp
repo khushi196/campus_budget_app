@@ -9,21 +9,23 @@ namespace campus {
 
 class PiggybankManager {
 public:
-    int addGoal(const Piggybank& piggybank);
-    bool updateGoal(int id, const Piggybank& piggybank);
-    bool deleteGoal(int id);
-    bool deposit(int id, double amount);
-    bool withdraw(int id, double amount);
-
-    const Piggybank* findGoal(int id) const;
-    std::vector<Piggybank> goals() const;
-
-private:
     struct GoalRecord {
         int id;
         Piggybank piggybank;
     };
 
+    int addGoal(const Piggybank& piggybank);
+    bool updateGoal(int id, const Piggybank& piggybank);
+    bool deleteGoal(int id);
+    void clearGoals();
+    bool deposit(int id, double amount);
+    bool withdraw(int id, double amount);
+
+    const Piggybank* findGoal(int id) const;
+    std::vector<Piggybank> goals() const;
+    std::vector<GoalRecord> goalRecords() const;
+
+private:
     GoalRecord* findRecord(int id);
 
     int nextId_ = 1;
