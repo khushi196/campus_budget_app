@@ -1,11 +1,11 @@
-# 🎓 Campus Budget App
+#  Campus Budget App
 
 > **A full-stack college expense tracker built as a resume / Object-Oriented Programming showcase.**
 > Flutter web frontend · C++ OOP backend · Gemini AI advisor · REST API bridge
 
 ---
 
-## 📌 Resume Description
+##  Resume Description
 
 A full-stack expense-tracking application for college students featuring a polished Flutter web UI,
 a C++ object-oriented domain backend, and a real-time Gemini AI chat advisor.
@@ -16,7 +16,7 @@ and connected to the Flutter frontend via a custom C++ HTTP REST API.
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -51,7 +51,7 @@ and connected to the Flutter frontend via a custom C++ HTTP REST API.
 
 ---
 
-## ✨ Features
+##  Features
 
 ### Flutter Frontend
 | Feature | Description |
@@ -78,7 +78,7 @@ and connected to the Flutter frontend via a custom C++ HTTP REST API.
 
 ---
 
-## 📸 Screenshots
+##  Screenshots
 
 | Dashboard | Expenses |
 |-----------|----------|
@@ -90,7 +90,7 @@ and connected to the Flutter frontend via a custom C++ HTTP REST API.
 
 ---
 
-## 🧠 OOP Concepts Demonstrated
+##  OOP Concepts Demonstrated
 
 | Concept | Where |
 |---------|-------|
@@ -104,7 +104,7 @@ and connected to the Flutter frontend via a custom C++ HTTP REST API.
 
 ---
 
-## 🗂️ Project Structure
+##  Project Structure
 
 ```
 campus_budget_app/
@@ -154,7 +154,7 @@ campus_budget_app/
 
 ---
 
-## 🚀 How to Run
+##  How to Run
 
 ### 1. Flutter Frontend (Local Storage mode — no backend needed)
 
@@ -279,4 +279,3 @@ Base URL: `http://localhost:8080`
 
 ---
 
-*Built by Khushi Prashad — Campus Budget App v1.0*
