@@ -1,6 +1,6 @@
 #  Campus Budget App
 
-> **A full-stack college expense tracker built as a resume / Object-Oriented Programming showcase.**
+> **A full-stack college expense tracker built as a Object-Oriented Programming showcase.**
 > Flutter web frontend · C++ OOP backend · Gemini AI advisor · REST API bridge
 
 ---
