@@ -208,7 +208,7 @@ g++ -std=c++17 -I backend/include `
 ### 4. Run Flutter Tests
 
 ```bash
-flutter test          # 15 tests
+flutter test          # 22 tests
 flutter analyze       # 0 issues
 ```
 
@@ -274,7 +274,7 @@ Base URL: `http://localhost:8080`
 - [ ] Add user authentication (JWT or Firebase)
 - [ ] Deploy Flutter to GitHub Pages / Firebase Hosting
 - [ ] Deploy C++ API to a VPS with `systemd`
-- [ ] Add AWS S3/DynamoDB for cloud storage
+- [x] Add AWS SAM scaffold for Cognito, DynamoDB, Lambda, and API Gateway
 - [ ] Add charts to the Reports page (fl_chart)
 
 ---

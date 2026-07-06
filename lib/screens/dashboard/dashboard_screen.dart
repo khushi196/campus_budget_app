@@ -19,10 +19,12 @@ class DashboardScreen extends StatefulWidget {
     super.key,
     required this.expenseService,
     required this.onDataChanged,
+    required this.onOpenAiAdvisor,
   });
 
   final ExpenseService expenseService;
   final VoidCallback onDataChanged;
+  final VoidCallback onOpenAiAdvisor;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -169,9 +171,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                     const SizedBox(width: 18),
-                    const Expanded(
+                    Expanded(
                       flex: 4,
-                      child: AiAdvisorPanel(insights: DemoData.insights),
+                      child: AiAdvisorPanel(
+                        insights: DemoData.insights,
+                        onOpenAdvisor: widget.onOpenAiAdvisor,
+                      ),
                     ),
                   ],
                 );
@@ -190,7 +195,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     piggybanks: expenseService.piggybanks,
                   ),
                   const SizedBox(height: 18),
-                  const AiAdvisorPanel(insights: DemoData.insights),
+                  AiAdvisorPanel(
+                    insights: DemoData.insights,
+                    onOpenAdvisor: widget.onOpenAiAdvisor,
+                  ),
                 ],
               );
             },

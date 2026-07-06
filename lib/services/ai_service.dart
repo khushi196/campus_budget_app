@@ -40,6 +40,7 @@ class GeminiAiService {
   GeminiAiService({
     BudgetContext? initialContext,
     this.backendUrl = defaultBackendUrl,
+    this.bearerToken,
   }) : _context = initialContext;
 
   static const defaultModel = 'gemini-flash-lite-latest';
@@ -47,6 +48,7 @@ class GeminiAiService {
   static const proxyPath = '/ai/gemini';
 
   final String backendUrl;
+  final String? bearerToken;
 
   // Full conversation history sent to Gemini on each call.
   final List<ChatMessage> _history = [];
@@ -71,8 +73,13 @@ class GeminiAiService {
       'contents': _buildContents(),
     });
 
+    final headers = {
+      'Content-Type': 'application/json',
+      if (bearerToken != null) 'Authorization': 'Bearer $bearerToken',
+    };
+
     final response = await http
-        .post(url, headers: {'Content-Type': 'application/json'}, body: body)
+        .post(url, headers: headers, body: body)
         .timeout(const Duration(seconds: 45));
 
     if (response.statusCode != 200) {

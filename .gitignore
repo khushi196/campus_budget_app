@@ -38,6 +38,8 @@ migrate_working_dir/
 /backend/*.exe
 /backend/server/httplib.h
 /backend/server/json.hpp
+/aws/.aws-sam/
+__pycache__/
 
 # C++ backend runtime data (JSON persistence)
 /backend/data/*.json
@@ -45,6 +47,7 @@ migrate_working_dir/
 
 # AI API keys — never commit secrets
 lib/core/constants/api_keys.dart
+.env
 
 # Symbolication related
 app.*.symbols

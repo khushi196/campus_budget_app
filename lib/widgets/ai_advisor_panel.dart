@@ -3,10 +3,28 @@ import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 import '../models/ai_insight.dart';
 
-class AiAdvisorPanel extends StatelessWidget {
-  const AiAdvisorPanel({super.key, required this.insights});
+class AiAdvisorPanel extends StatefulWidget {
+  const AiAdvisorPanel({
+    super.key,
+    required this.insights,
+    required this.onOpenAdvisor,
+  });
 
   final List<AiInsight> insights;
+  final VoidCallback onOpenAdvisor;
+
+  @override
+  State<AiAdvisorPanel> createState() => _AiAdvisorPanelState();
+}
+
+class _AiAdvisorPanelState extends State<AiAdvisorPanel> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,17 +62,19 @@ class AiAdvisorPanel extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             TextField(
+              controller: _controller,
               decoration: InputDecoration(
                 hintText: 'I spent 120 on lunch today',
                 suffixIcon: IconButton(
-                  tooltip: 'Analyze expense',
-                  onPressed: () {},
-                  icon: const Icon(Icons.arrow_forward_rounded),
+                  tooltip: 'Open AI Advisor',
+                  onPressed: widget.onOpenAdvisor,
+                  icon: const Icon(Icons.auto_awesome_rounded),
                 ),
               ),
+              onSubmitted: (_) => widget.onOpenAdvisor(),
             ),
             const SizedBox(height: 16),
-            ...insights.map((insight) => _InsightTile(insight: insight)),
+            ...widget.insights.map((insight) => _InsightTile(insight: insight)),
           ],
         ),
       ),

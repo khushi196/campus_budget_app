@@ -8,9 +8,16 @@ import '../../services/ai_service.dart';
 import '../../services/expense_service.dart';
 
 class AiAdvisorScreen extends StatefulWidget {
-  const AiAdvisorScreen({super.key, required this.expenseService});
+  const AiAdvisorScreen({
+    super.key,
+    required this.expenseService,
+    this.aiBackendUrl,
+    this.aiBearerToken,
+  });
 
   final ExpenseService expenseService;
+  final String? aiBackendUrl;
+  final String? aiBearerToken;
 
   @override
   State<AiAdvisorScreen> createState() => _AiAdvisorScreenState();
@@ -41,7 +48,11 @@ class _AiAdvisorScreenState extends State<AiAdvisorScreen>
   void initState() {
     super.initState();
 
-    _aiService = GeminiAiService(initialContext: _buildContext());
+    _aiService = GeminiAiService(
+      initialContext: _buildContext(),
+      backendUrl: widget.aiBackendUrl ?? GeminiAiService.defaultBackendUrl,
+      bearerToken: widget.aiBearerToken,
+    );
 
     _dotController = AnimationController(
       vsync: this,
@@ -128,7 +139,19 @@ class _AiAdvisorScreenState extends State<AiAdvisorScreen>
 
   String _cleanErrorMessage(String message) {
     if (message.contains('API_KEY_INVALID')) {
-      return 'Invalid Gemini API key. Check GEMINI_API_KEY in the C++ backend terminal.';
+      return widget.aiBackendUrl == null
+          ? 'Invalid Gemini API key. Check GEMINI_API_KEY in the C++ backend terminal.'
+          : 'Invalid Gemini API key. Update /campus-budget/gemini-api-key in AWS Parameter Store and redeploy.';
+    }
+
+    if (message.contains('Gemini API key is not configured')) {
+      return widget.aiBackendUrl == null
+          ? 'Gemini key is missing. Set GEMINI_API_KEY before starting the C++ backend.'
+          : 'Gemini key is missing in AWS. Run aws ssm put-parameter for /campus-budget/gemini-api-key.';
+    }
+
+    if (message.contains('AccessDenied') || message.contains('ssm')) {
+      return 'AWS Lambda cannot read the Gemini key from Parameter Store. Redeploy the SAM stack and check the parameter name.';
     }
 
     try {
@@ -157,7 +180,7 @@ class _AiAdvisorScreenState extends State<AiAdvisorScreen>
     return Column(
       children: [
         _Header(onClear: _clearChat, messageCount: _aiService.history.length),
-        
+
         Expanded(
           child: _aiService.history.isEmpty && !_isLoading
               ? _WelcomeView(
@@ -256,8 +279,6 @@ class _Header extends StatelessWidget {
 }
 
 // ── Backend AI status banner ─────────────────────────────────────────────────
-
-
 
 // ── Welcome / suggested prompts ──────────────────────────────────────────────
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:campus_budget_app/main.dart';
+import 'package:campus_budget_app/screens/login/login_screen.dart';
 
 void main() {
   testWidgets('shows login first and opens dashboard after sign in', (
@@ -15,12 +16,212 @@ void main() {
     expect(find.text('Recent Expenses'), findsNothing);
 
     await tester.ensureVisible(find.text('Sign in'));
+    await tester.ensureVisible(find.text('Sign in'));
     await tester.tap(find.text('Sign in'));
     await tester.pumpAndSettle();
 
     expect(find.text('AI Budget Advisor'), findsOneWidget);
     expect(find.text('Recent Expenses'), findsOneWidget);
     expect(find.text('Daily limit left'), findsOneWidget);
+  });
+
+  testWidgets('cloud login submits email and password before entering app', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    var signedIn = false;
+    var submittedEmail = '';
+    var submittedPassword = '';
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LoginScreen(
+          cloudMode: true,
+          onSignIn: (email, password) async {
+            signedIn = true;
+            submittedEmail = email;
+            submittedPassword = password;
+          },
+          onSignUp: (_, _) async {},
+          onConfirmSignUp: (_, _) async {},
+          onForgotPassword: (_) async {},
+          onConfirmForgotPassword: (_, _, _) async {},
+        ),
+      ),
+    );
+
+    await tester.enterText(
+      find.byKey(const Key('login-email-field')),
+      'khushi@example.com',
+    );
+    await tester.enterText(
+      find.byKey(const Key('login-password-field')),
+      'Password123',
+    );
+    await tester.tap(find.text('Sign in'));
+    await tester.pumpAndSettle();
+
+    expect(signedIn, isTrue);
+    expect(submittedEmail, 'khushi@example.com');
+    expect(submittedPassword, 'Password123');
+  });
+
+  testWidgets('cloud signup sends OTP and returns to sign in after verify', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    var signUpEmail = '';
+    var signUpPassword = '';
+    var confirmEmail = '';
+    var confirmCode = '';
+    var signedIn = false;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LoginScreen(
+          cloudMode: true,
+          onSignIn: (_, _) async => signedIn = true,
+          onSignUp: (email, password) async {
+            signUpEmail = email;
+            signUpPassword = password;
+          },
+          onConfirmSignUp: (email, code) async {
+            confirmEmail = email;
+            confirmCode = code;
+          },
+          onForgotPassword: (_) async {},
+          onConfirmForgotPassword: (_, _, _) async {},
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Create account'));
+    await tester.pumpAndSettle();
+    expect(find.text('Create your account'), findsOneWidget);
+    expect(find.text('Send OTP'), findsOneWidget);
+
+    await tester.enterText(
+      find.byKey(const Key('login-email-field')),
+      'khushi@example.com',
+    );
+    await tester.enterText(
+      find.byKey(const Key('login-password-field')),
+      'Password123',
+    );
+    await tester.tap(find.text('Send OTP'));
+    await tester.pumpAndSettle();
+
+    expect(signUpEmail, 'khushi@example.com');
+    expect(signUpPassword, 'Password123');
+    expect(find.text('Verify OTP'), findsWidgets);
+
+    await tester.enterText(find.byKey(const Key('login-code-field')), '123456');
+    await tester.tap(find.text('Verify OTP').last);
+    await tester.pumpAndSettle();
+
+    expect(confirmEmail, 'khushi@example.com');
+    expect(confirmCode, '123456');
+    expect(signedIn, isFalse);
+    expect(find.text('Welcome back'), findsOneWidget);
+    expect(find.text('Account verified. Please sign in.'), findsOneWidget);
+  });
+
+  testWidgets('cloud forgot password sends OTP and resets password', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    var forgotEmail = '';
+    var resetEmail = '';
+    var resetCode = '';
+    var resetPassword = '';
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LoginScreen(
+          cloudMode: true,
+          onSignIn: (_, _) async {},
+          onSignUp: (_, _) async {},
+          onConfirmSignUp: (_, _) async {},
+          onForgotPassword: (email) async => forgotEmail = email,
+          onConfirmForgotPassword: (email, code, password) async {
+            resetEmail = email;
+            resetCode = code;
+            resetPassword = password;
+          },
+        ),
+      ),
+    );
+
+    await tester.enterText(
+      find.byKey(const Key('login-email-field')),
+      'khushi@example.com',
+    );
+    await tester.tap(find.text('Forgot password?'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Reset password'), findsOneWidget);
+    await tester.tap(find.text('Send reset OTP'));
+    await tester.pumpAndSettle();
+
+    expect(forgotEmail, 'khushi@example.com');
+    expect(find.text('Enter reset OTP'), findsOneWidget);
+
+    await tester.enterText(find.byKey(const Key('login-code-field')), '654321');
+    await tester.enterText(
+      find.byKey(const Key('login-password-field')),
+      'Newpass123',
+    );
+    await tester.tap(find.text('Reset password').last);
+    await tester.pumpAndSettle();
+
+    expect(resetEmail, 'khushi@example.com');
+    expect(resetCode, '654321');
+    expect(resetPassword, 'Newpass123');
+    expect(find.text('Password reset. Please sign in.'), findsOneWidget);
+  });
+
+  testWidgets('local demo mode does not enter app from create account', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    var enteredApp = false;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LoginScreen(
+          cloudMode: false,
+          onDemoSignIn: () => enteredApp = true,
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Create account'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Send OTP'));
+    await tester.pumpAndSettle();
+
+    expect(enteredApp, isFalse);
+    expect(find.text('Welcome back'), findsNothing);
+    expect(
+      find.text('AWS signup is not connected in local demo mode.'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('adds an expense and updates dashboard totals', (tester) async {
@@ -82,6 +283,24 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Spending Report'), findsOneWidget);
     expect(find.text('Highest category'), findsOneWidget);
+  });
+
+  testWidgets('global search navigates to pages', (tester) async {
+    tester.view.physicalSize = const Size(1400, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const MyApp());
+    await _signIn(tester);
+
+    await tester.tap(find.byTooltip('Search'));
+    await tester.pumpAndSettle();
+    expect(find.text('Search pages'), findsOneWidget);
+
+    await tester.tap(find.text('Reports').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Spending Report'), findsOneWidget);
   });
 
   testWidgets('manages income, expenses, limits, and reset controls', (
